@@ -13,3 +13,18 @@
  *= require_tree .
  *= require_self
  */
+
+ body{
+     margin: 0 !important;
+ }
+.userIcon{
+    display: flex;
+}
+
+.userIcon > p{
+    line-height: 48px;
+}
+
+.home_container{
+    margin-top:24px;
+}

@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import ClockTable from "./ClockEvent";
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -40,7 +39,7 @@ const Home = () => {
     const [selectedDate, setSelectedDate] = React.useState(new Date());
     
     const [data, setData] = useState([]);
-    const [loaded, setLoaded] = useState(false);
+    const [clockingin, setClockingin]  = React.useState(false);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -66,24 +65,28 @@ const Home = () => {
     useEffect(() => {
         api.get('/get_timesheet').then(({data}) => {
             console.log(data)
-            setData(data);
+            setData(data.clock_event);
+            setClockingin(data.isClockingin)
             setLoaded(true);
+            
         }).catch(res => {
           console.log(res)
         });
+
+
       }, []);
 
       const columns = [
         {
           name: 'Date',
-          selector:  row => `${ row.entry_date }`,
+          selector:  row => `${ row.clock_in_date }`,
           sortable: true,
           center: true,
-          cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{row.entry_date}</a>
+          cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{row.clock_in_date}</a>
         },
-        { name: 'Clock In', selector: row => `${ row.clock_in }`, sortable: true, center: true },
-        { name: 'Clock Out', selector: row => `${ row.clock_out }`, sortable: true, center: true },
-        { name: 'Clocking In', selector:  row => `${ row.clocking_in }`, sortable: true, center: true },
+        { name: 'Clock In', selector: row => `${ row.clock_in_time }`, sortable: true, center: true },
+        { name: 'Clock Out', selector: row => `${ row.clock_out_time }`, sortable: true, center: true },
+        { name: 'Hours', selector:  row => `${ row.total_hours }`, sortable: true, center: true },
       ];
 
     return ( 
@@ -136,9 +139,16 @@ const Home = () => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button variant="contained" color="success" onClick={handleOpen}>
-                        Clock In
-                    </Button>
+                    { clockingin &&
+                        <Button variant="contained" color="error" onClick={handleOpen}>
+                            Clock Out
+                        </Button>
+                    }
+                    { clockingin == false &&
+                        <Button variant="contained" color="success" onClick={handleOpen}>
+                            Clock In
+                        </Button>
+                    }
                 </CardActions>
             </Card>
             <br/>
@@ -147,7 +157,9 @@ const Home = () => {
 
             {data && (
                 <>
-           
+                <Typography gutterBottom variant="h5" component="div">
+                       TimeCard
+                    </Typography>
                 <DataTable columns={columns} data={data} pagination highlightOnHover />
                 </>
             )}

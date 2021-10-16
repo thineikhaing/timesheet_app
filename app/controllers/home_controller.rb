@@ -7,7 +7,7 @@ class HomeController < ApplicationController
     entryTime = params[:dateTime]
 
     if entryTime
-      dateTime = DateTime.parse entryTime
+      dateTime = entryTime #DateTime.parse entryTime
     else
       dateTime = DateTime.now
     end
@@ -28,11 +28,14 @@ class HomeController < ApplicationController
   end
 
   def get_timesheet
-
-    clock_events = current_user.clock_events.select(:id, :entry_date, :clock_in, :clock_out, :clocking_in)
-    timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
-    # render json: {status:200, timelogs: timelogs,clock_events:clock_events}
-    render json: clock_events.to_json(methods: [:entry_date,:clock_in,:clock_out, :clocking_in])
+    isClockingin = false
+    clock_events = current_user.clock_events.select(:id, :entry_date, :clock_in, :clock_out)
+    p check_clocking_in = current_user.clock_events.where(clocking_in: true).take
+    if check_clocking_in.present?
+      isClockingin = true
+    end
+    # timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
+    render json: {clock_event: clock_events, isClockingin: isClockingin } 
 
   end
 

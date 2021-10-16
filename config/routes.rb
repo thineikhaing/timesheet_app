@@ -6,7 +6,9 @@ Rails.application.routes.draw do
 
   post 'create_clock_event' , to: 'home#create_clock_event'
   get 'get_timesheet', to: 'home#get_timesheet'
-  
+  get 'edit_clockevent/:id' , to: 'home#edit_clockevent'
+  post 'update_clockevent' , to: 'home#update_clockevent'
+
   namespace :api do
     namespace :v1 do
       match 'clock_event/index' , via: [:get, :post]

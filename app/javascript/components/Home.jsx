@@ -17,6 +17,9 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import TimePicker from '@mui/lab/TimePicker';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import DataTable from 'react-data-table-component';
+import Paper from '@mui/material/Paper';
+import "react-data-table-component-extensions/dist/index.css";
+
 import api from "./Api";
 
 const modalStyle = {
@@ -41,21 +44,50 @@ const Home = () => {
     const [data, setData] = useState([]);
     const [clockingin, setClockingin]  = React.useState(false);
 
+    const [selected, setSelected] = useState(null);
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const handleDateChange = date => setSelectedDate(date); 
+    const handleDateChange = date => setSelectedDate(date);
 
+    const handleInTimeChange = date => {
+        console.log("In time", date)
+        setSelected({ ...selected, clock_in: date});
+    };
+    
+    const handleOutTimeChange = date => {
+        console.log("Out time", date)
+        setSelected({ ...selected, clock_out: date});
+    };
+    const handleEditTime = async () => {
+        console.log("handleEditTime")
+        console.log(selected)
+        await api.post('/update_clockevent', { id: selected.id, clock_in: selected.clock_in, clock_out: selected.clock_out }).then(res => {
+            setSelected(null)
+        }).catch(res => {
+          console.log(res)
+        })
+        location.reload()
+    }
+
+    const handleEditCancel =() =>{
+        setSelected(null)
+    }
+    
+    const handleSelectDay = async (id) => {
+
+        await api.get(`/edit_clockevent/${id}`).then(({data}) => {
+          setSelected(data)
+        //   setSelectedTime(null)
+        }).catch(res => {
+          console.log('error', error)
+        })
+    }
     const handleAddEntry = async () => {
         console.log(selectedDate)
         await api.post('/create_clock_event', { dateTime: selectedDate }).then(res => {
             console.log(res)
             handleClose();
-        //   Swal.fire({
-        //     icon: 'success',
-        //     title: 'Time entry added successfully',
-        //     showConfirmButton: false,
-        //     timer: 1500
-        //   })
         }).catch(res => {
           console.log('Something wrong');
         })
@@ -67,7 +99,6 @@ const Home = () => {
             console.log(data)
             setData(data.clock_event);
             setClockingin(data.isClockingin)
-            setLoaded(true);
             
         }).catch(res => {
           console.log(res)
@@ -87,27 +118,119 @@ const Home = () => {
         { name: 'Clock In', selector: row => `${ row.clock_in_time }`, sortable: true, center: true },
         { name: 'Clock Out', selector: row => `${ row.clock_out_time }`, sortable: true, center: true },
         { name: 'Hours', selector:  row => `${ row.total_hours }`, sortable: true, center: true },
+        {
+            name: "Action",
+            cell: row => <Button onClick={() => handleSelectDay(row.id)}>Edit</Button>,
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+          }
       ];
+
 
     return ( 
         <React.Fragment>
         <CssBaseline />
+
+        <Container className="home_container">
+            <Card sx={{ maxWidth: 345 }}>
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Welcome, {currentUser.username}
+                    </Typography>
+                    <Typography compoent='p'>{currentUser.email}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Check out the current clock in/out events, or create a new one.
+                    </Typography>
+                </CardContent>
+                <CardActions>
+                    { clockingin &&
+                        <Button variant="contained" color="error" onClick={handleOpen}>
+                            Clock Out
+                        </Button>
+                    }
+                    { clockingin == false &&
+                        <Button variant="contained" color="warning" onClick={handleOpen}>
+                            Clock In
+                        </Button>
+                    }
+                </CardActions>
+            </Card>
+            <br/>
+          
+
+            { selected &&
+
+                <Paper className="selected-day">
+                    
+                    <Typography className="selected_date" variant="p">
+                    { selected.clock_in_date }
+                    </Typography>
+                    <br/>
+                    <Container maxWidth="sm">
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <Stack className="time_stack" direction="row" spacing={3}>
+                                <TimePicker
+                                label="Clock In Time"
+                                value={selected.clock_in}
+                                onChange={handleInTimeChange}
+                                renderInput={(params) => <TextField {...params} />}
+                                />
+                                <br/>
+
+                                { selected.clocking_in == false &&
+                                    <TimePicker
+                                    label="Clock Out Time"
+                                    value={selected.clock_out}
+                                    onChange={handleOutTimeChange}
+                                    renderInput={(params) => <TextField {...params} />}
+                                />
+                                }
+                                
+                            
+                            </Stack>
+                        </LocalizationProvider>
+                        <br/>
+                        <Button variant="text" onClick={handleEditTime}>Update</Button>
+                        &nbsp;
+                        <Button variant="text" onClick={handleEditCancel} >Cancel</Button>
+                    </Container>    
+                </Paper>
+          }
+
+
+
+            {data && (
+                <>
+                <br/>
+                <Typography gutterBottom variant="h5" component="div">
+                       TimeCard
+                </Typography>
+
+
+                <DataTable columns={columns} data={data} pagination highlightOnHover />
+                </>
+            )}
+
+        </Container>
+
+
         <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
         >
             <Box sx={modalStyle}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-            Select the date and time to Clock In.
+                Select the date and time.
             </Typography>
             <br/>
             
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <Stack spacing={3}>
                     <DesktopDatePicker
-                    label="Date desktop"
+                    label="Date"
                     inputFormat="MM/dd/yyyy"
                     value={selectedDate}
                     onChange={handleDateChange}
@@ -127,44 +250,7 @@ const Home = () => {
 
             </Box>
         </Modal>
-        <Container className="home_container">
-            <Card sx={{ maxWidth: 345 }}>
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Welcome, {currentUser.username}
-                    </Typography>
-                    <Typography compoent='p'>{currentUser.email}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Check out the current clock in/out events, or create a new one.
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    { clockingin &&
-                        <Button variant="contained" color="error" onClick={handleOpen}>
-                            Clock Out
-                        </Button>
-                    }
-                    { clockingin == false &&
-                        <Button variant="contained" color="success" onClick={handleOpen}>
-                            Clock In
-                        </Button>
-                    }
-                </CardActions>
-            </Card>
-            <br/>
-            <Divider light />
-            {/* <ClockTable/> */}
 
-            {data && (
-                <>
-                <Typography gutterBottom variant="h5" component="div">
-                       TimeCard
-                    </Typography>
-                <DataTable columns={columns} data={data} pagination highlightOnHover />
-                </>
-            )}
-
-        </Container>
         </React.Fragment>
         
   );

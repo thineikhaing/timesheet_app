@@ -4,7 +4,7 @@ class ClockEvent < ApplicationRecord
     
 
     def as_json(options=nil)
-        super(only: [:id, :entry_date, :clock_in, :clock_out], methods: [:clock_in_date,:clock_in_time, :clock_out_time,:total_hours])
+        super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:clock_in_date,:clock_in_time, :clock_out_time,:total_hours])
       end
 
     def clock_in_date
@@ -23,7 +23,7 @@ class ClockEvent < ApplicationRecord
         if self.clock_out.present?
             self.clock_out.localtime.strftime('%l:%M %p')
         else
-            "-"
+            ""
         end
     end
 
@@ -33,7 +33,7 @@ class ClockEvent < ApplicationRecord
             total_hours.round(1)
             return "#{total_hours.round(1)} Hours"
         else
-            return "-"
+            return ""
         end
     end
 

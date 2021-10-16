@@ -32,3 +32,32 @@
 th{
     font-weight: 800 !important;
 }
+
+.date-click {
+    cursor: pointer;
+    -webkit-text-decoration: underline;
+    text-decoration: underline;
+}
+
+.selected-day {
+    text-align: center;
+    padding: 8px;
+}
+
+.selected_date{
+    background-color: #2EACBA;
+    width: 297px;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 20px !important;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.time_stack{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

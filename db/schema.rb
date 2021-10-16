@@ -17,8 +17,10 @@ ActiveRecord::Schema.define(version: 2021_10_16_040649) do
 
   create_table "clock_events", force: :cascade do |t|
     t.integer "user_id"
+    t.date "entry_date"
     t.datetime "clock_in"
     t.datetime "clock_out"
+    t.boolean "clocking_in", default: false
     t.string "note"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

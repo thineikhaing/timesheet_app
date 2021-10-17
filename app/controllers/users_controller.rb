@@ -1,32 +1,42 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
+  before_action :get_user, only: [:show, :update, :destroy]
+
   def index
     @users = User.all
   end
 
-  def show
-    @user = User.find(params[:id])
+def create
+    @user = User.create!(user_params)
+    if @user.persisted?
+      render json: @user, status: :created
+    else
+      render json: { message: 'Error creating user' }, status: 402
+    end
   end
 
-  def edit
-    @user = current_user
+  def show
+    render json: @user, status: :ok
   end
 
   def update
-    respond_to do |format|
-      if current_user.update(user_params)
-        format.html { redirect_to current_user, notice: 'You successfully updated your profile.' }
-      else
-        format.html { render :edit }
-      end
-    end
+    @user.update(user_params)
+
+    render json: @user, status: :ok
+  end
+
+  def destroy
+    @user.destroy
+    render json: {}, status: :ok
   end
 
   private
 
+  def get_user
+    @user = User.find(params[:id])
+  end
+
   def user_params
-    params.require(:user).permit(
-      :username
-    )
+    params.require(:user).permit(:username, :email, :password, :password_confirmation, :role, :hours_per_week)
   end
 end

@@ -35,7 +35,7 @@ class HomeController < ApplicationController
       clock_event = clock_event.update(clock_out: dateTime,clocking_in: false)
     else
 
-      isInbtwTime = check_overlap_clockedin(dateTime) 
+      isInbtwTime = check_overlap_clockedin(dateTime, dateTime) 
       if isInbtwTime == false
         clock_event = ClockEvent.create(user_id: current_user.id, entry_date: dateTime, clock_in: dateTime,clocking_in: true)   
       end

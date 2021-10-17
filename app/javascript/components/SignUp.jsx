@@ -51,9 +51,7 @@ export const Container = styled.div`
   .submit_btn{
     background: rgb(46, 172, 186) !important;
   }
-  .text_btn{
-    color: rgb(46, 172, 186) !important;
-  }
+ 
 
   .card{
     min-width: 360px;

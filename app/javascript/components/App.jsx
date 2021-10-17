@@ -17,8 +17,7 @@ const App = ({ current_user }) =>(
                 <Grid spacing={1} container item xs={12}>
                     
                     <Grid item xs={12} >
-                        
-                        {Routes}
+                        <Routes />
                     </Grid>
                 </Grid>
             </Box>

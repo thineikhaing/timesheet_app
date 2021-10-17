@@ -26,7 +26,6 @@ class ClockEvent < ApplicationRecord
         where("EXTRACT(DOW FROM clocked_in) in (?)", 1..5)
     }
 
-
     def worked_hr
         if self.clock_in.present? && self.clock_out.present?
             ((self.clock_out.to_f - self.clock_in.to_f) / 3600 ).round(1)

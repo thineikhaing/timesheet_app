@@ -25,7 +25,7 @@ export default function MenuAppBar() {
   };
 
   const handleLogOut = async () => {
-    await api.delete('/users/sign_out').catch(res => {
+    await api.delete('/users/sign_out').catch(res => {r
       console.log(res)
     })
     location.reload();
@@ -37,7 +37,7 @@ export default function MenuAppBar() {
         <Toolbar>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Timesheet Application
+          <Link className="homelink" href="/">Timesheet Application</Link>
           </Typography>
           <div className="userIcon">
                 <Typography compoent='p'>{currentUser.username}</Typography>

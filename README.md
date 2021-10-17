@@ -1,6 +1,6 @@
 # Timesheet Applcation
 
-Timesheet Applcation is a system that focuses primarily on managing the attendance of employees and makes easy for you to track your monthly and weekly hours balance.
+Timesheet Applcation is a system that focuses primarily on managing the attendance and makes easy for you to track your monthly and weekly hours balance.
 
 ## Live Version
 

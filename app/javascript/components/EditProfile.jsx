@@ -9,25 +9,53 @@ import api from "./Api";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import styled from 'styled-components'
+import Alert from '@mui/material/Alert';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import AlertTitle from '@mui/material/AlertTitle';
 
 const EditProfile = () => {
     const [currentUser, setCurrentUser] = useContext(MainContext);
-    console.log(currentUser)
+    const [openalert, setAlertOpen] = React.useState(false);
     const handleUserSubmit = async (e) => {
         e.preventDefault()
         let formData = new FormData(e.target);
         await api.put(`/users/${currentUser.id}`, formData).then((data) => {
             setCurrentUser(data);
-            location.reload()
+            console.log(currentUser)
+            // location.reload()
+            setAlertOpen(true)
+
         }).catch(res => {
             console.log(res)
         })
-      }
+    }
 
     return ( 
         <React.Fragment>
         <CssBaseline />
         <Container className="edit_content">
+            <Collapse in={openalert}>
+                <Alert severity="success"
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        setAlertOpen(false);
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >  
+                <AlertTitle>Profile updated successfully</AlertTitle>
+
+                </Alert>
+            </Collapse>
             <Card className="card">
                 <CardContent>
                 {/* <AccessTimeIcon className="clock-icon" /> */}
@@ -40,9 +68,7 @@ const EditProfile = () => {
                 readOnly: true,
             }}/>
                         <br/>
-                        {/* <TextField type="password" name="user[password]" label="Password" defaultValue=''/>
-                        <br/>
-                        <TextField type="password" name="user[password_confirmation]" label="Password Confirmation" /> */}
+      
                         <div className="button-group">
                         
                         <Button className="submit_btn" type="submit" variant="contained" color="warning">

@@ -21,7 +21,6 @@ def create
 
   def update
     @user.update(user_params)
-
     render json: @user, status: :ok
   end
 
@@ -37,6 +36,6 @@ def create
   end
 
   def user_params
-    params.require(:user).permit(:username, :email, :password, :password_confirmation, :role, :hours_per_week)
+    params.require(:user).permit(:username, :email, :password, :password_confirmation, :role)
   end
 end

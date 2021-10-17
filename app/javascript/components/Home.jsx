@@ -269,7 +269,7 @@ const Home = () => {
             }
             sx={{ mb: 2 }}
             >  
-            <AlertTitle>Please enter avalid Time. </AlertTitle>
+            <AlertTitle>Please enter a valid Time. </AlertTitle>
 
             </Alert>
         </Collapse>

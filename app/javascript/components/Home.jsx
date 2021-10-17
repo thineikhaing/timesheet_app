@@ -133,10 +133,19 @@ const Home = () => {
         if(editEntry){
             await api.post('/update_clockevent', { id: selected.id, clock_in: selected.clock_in, clock_out: selected.clock_out }).then(res => {
                 setSelected(null)
+                console.log(res)
+
+                var overlapTime = res.data.overlapTime
+                if (overlapTime == true){
+                    setAlertOpen2(true);
+                }
+                else{
+                    location.reload(); 
+                }
+
             }).catch(res => {
             console.log(res)
             })
-            location.reload()
         }
 
     }
@@ -373,7 +382,7 @@ const Home = () => {
                             </Stack>
                         </LocalizationProvider>
 
-                        <Button variant="text" onClick={handleEditTime}>Update</Button>
+                        <Button variant="contained" className="submit_btn" onClick={handleEditTime}>Update</Button>
                         &nbsp;
                         <Button variant="text" onClick={handleEditCancel} >Cancel</Button>
                     </Container>  

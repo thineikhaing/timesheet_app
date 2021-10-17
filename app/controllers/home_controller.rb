@@ -29,21 +29,13 @@ class HomeController < ApplicationController
       dateTime = DateTime.now
     end
     
-    check_arr = []
     clock_event = current_user.clock_events.where(entry_date: dateTime,clocking_in: true).take 
     if clock_event.present?
       p "set clock out time"
       clock_event = clock_event.update(clock_out: dateTime,clocking_in: false)
     else
-      prev_events = current_user.clock_events.where(entry_date: dateTime,clocking_in: false)
-      prev_events.each do |event|
-        p start_time = event.clock_in
-        p end_time = event.clock_out
-        check_arr.push((start_time..end_time).cover?(dateTime))
-      end
 
-      isInbtwTime = check_arr.include?(true)
-
+      isInbtwTime = check_overlap_clockedin(dateTime) 
       if isInbtwTime == false
         clock_event = ClockEvent.create(user_id: current_user.id, entry_date: dateTime, clock_in: dateTime,clocking_in: true)   
       end
@@ -60,13 +52,37 @@ class HomeController < ApplicationController
 
   def update_clockevent
     clock_event = ClockEvent.find(params[:id])
-    clock_event.update(clock_in: params[:clock_in], clock_out: params[:clock_out])
-    render json: clock_event.to_json
+    p "check overlap time"
+    p isInbtwTime = check_overlap_clockedin(clock_event.entry_date, params[:clock_in]),
+
+    if isInbtwTime == false
+       p "update event!!!"
+      clock_event.update(clock_in: params[:clock_in], clock_out: params[:clock_out])
+    end
+
+    render json: {clock_event: current_user.clock_events, overlapTime: isInbtwTime}, status: :ok
   end
 
   def delete_clockevent
     ClockEvent.find(params[:id]).destroy
     render json: {}, status: :ok
   end
+
+  protected
+
+  def check_overlap_clockedin(entryDate, clockedTime)
+    check_arr = []
+    prev_events = current_user.clock_events.where(entry_date: entryDate,clocking_in: false)
+      prev_events.each do |event|
+        start_time = event.clock_in
+        end_time = event.clock_out
+        check_arr.push((start_time..end_time).cover?(clockedTime))
+      end
+      p check_arr
+      check_arr.include?(true)
+      
+
+  end
+
 
 end

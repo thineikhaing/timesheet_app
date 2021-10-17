@@ -20,7 +20,7 @@ import Paper from '@mui/material/Paper';
 import AlarmAddIcon from '@mui/icons-material/AlarmAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from "./Api";
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Alert from '@mui/material/Alert';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
@@ -94,6 +94,9 @@ const Home = () => {
     const [monthlyHr, setMonthlyHr] = useState('00:00');
 
     useEffect(() => {
+        var timezone = moment.tz.guess();
+        console.log("timezone", timezone)
+        
         api.get('/get_timesheet').then(({data}) => {
             setData(data.clock_event);
             setClockingin(data.isClockingin)
@@ -164,7 +167,12 @@ const Home = () => {
         }
 
         if(addEntry){
-            await api.post('/create_clock_event', { dateTime: selectedDate }).then(res => {
+            var timeoffset = moment().format('ZZ')
+            var timezone = moment.tz.guess();
+            console.log("timezone", timezone)
+            console.log(selectedDate)
+
+            await api.post('/create_clock_event', { dateTime: selectedDate,timezone: timezone,timeoffset:timeoffset}).then(res => {
                 console.log(res)
                     handleClose();
                 }).catch(res => {
@@ -192,8 +200,12 @@ const Home = () => {
           center: true,
           cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{row.clock_in_date}</a>
         },
-        { name: 'Clock In', selector: row => `${ row.clock_in_time }`, sortable: true, center: true },
-        { name: 'Clock Out', selector: row => `${ row.clock_out_time }`, sortable: true, center: true },
+        { name: 'Clock In', selector: row => `${ 
+            moment(row.clock_in).local().format('hh:mm A')
+        }`, sortable: true, center: true },
+        { name: 'Clock Out', selector: row => `${ 
+            moment(row.clock_out_time).local().format('hh:mm A')
+        }`, sortable: true, center: true },
         { name: 'Hours', selector:  row => `${ row.total_hours }`, sortable: true, center: true },
         {
             name: "Actions",

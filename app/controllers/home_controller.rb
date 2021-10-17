@@ -21,15 +21,22 @@ class HomeController < ApplicationController
   end
 
   def create_clock_event
-    entryTime = params[:dateTime]
+   
+    p "user timezone"
+    p entryTime = params[:dateTime]
+    p timezone = params[:timezone]
 
     if entryTime
-      dateTime = DateTime.parse entryTime
+      dateTime = DateTime.parse(entryTime).utc
     else
       dateTime = DateTime.now
     end
 
     p dateTime
+    
+    # dateTime= dateTime.in_time_zone(timezone)
+
+    
     clock_event = current_user.clock_events.where(entry_date: dateTime,clocking_in: true).take 
     if clock_event.present?
       p "set clock out time"

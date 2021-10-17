@@ -3,7 +3,7 @@ class ClockEvent < ApplicationRecord
     validates :entry_date, :clock_in, presence: true
     
     def as_json(options=nil)
-        super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:clock_in_date,:clock_in_time, :clock_out_time,:total_hours])
+        super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:clock_in_date, :clock_out_time,:total_hours])
     end
 
     scope :current_month, ->{
@@ -32,15 +32,10 @@ class ClockEvent < ApplicationRecord
         end
     end
 
-    def clock_in_time
-        if self.clock_in.present?
-            self.clock_in.localtime.strftime('%l:%M %p')
-        end
-    end
 
     def clock_out_time
         if self.clock_out.present?
-            self.clock_out.localtime.strftime('%l:%M %p')
+            self.clock_out
         else
             ""
         end

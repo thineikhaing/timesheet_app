@@ -45,7 +45,18 @@ Create and migrate database and start the server.
 ```sh
 $ rails db:create db:migrate
 $ rails s
+$ rake db:seed
 ```
+
+To access the application as an administrator, use the following account:
+    
+    email: admin@example.com
+    password: password
+    
+To access the application as an employee, use the following account:
+    
+    email: employee@example.com
+    password: password
 
 #### Timesheet Application Schema
 Each User and their clockin/out event logged in the database will contain the following schema:
@@ -68,6 +79,16 @@ Clock Event Table
 + Note (String)
 + Created At (Timestamp)
 + Updated At (Timestamp)
+
+### Run Rspec Tests
+ 
+To run the Rspec tests, you should be on the path of the project.
+
+    [~/Desktop/timesheet_app]$     
+     
+You will be able to run the Rspec tests by using this command:
+      
+    bundle exec rspec spec      
 
 ### Future Considerations Todos
 

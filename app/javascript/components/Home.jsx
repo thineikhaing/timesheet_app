@@ -1,4 +1,4 @@
-import React, { useContext ,useState, useEffect} from "react";
+import React, { useContext ,useState, useEffect,useMemo} from "react";
 import { MainContext } from "./UserProvider";
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
@@ -78,23 +78,49 @@ const Home = () => {
 
     const [selected, setSelected] = useState(null);
 
-    const handleClockin = ()=>{
-        setOpen(true);
-    }
-
-    const handleCLockout = ()=>{
-        console.log("clockedinDate", clockedinDate)
-        setSelected(null)
-        setSelectedDate(clockedinDate);
-        setOpen(true);
-    }
-
-
     const handleClose = () => setOpen(false);
     const handleDateChange = date => setSelectedDate(date);
 
     const [weeklyHr, setWeeklyHr] = useState('00:00');
     const [monthlyHr, setMonthlyHr] = useState('00:00');
+
+    const columns = [
+        {
+            name: 'Date',
+            selector:  row => `${ moment(row.entry_date).format('MMMM Do YYYY') }`,
+            sortable: true,
+            center: true,
+            cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{moment(row.entry_date).format('MMMM Do YYYY')}</a>
+        },
+        {   name: 'Clock In', 
+            selector: row => `${ moment(row.clock_in).local().format('hh:mm A')}`, 
+            sortable: true, center: true 
+        },
+        {   
+            name: 'Clock Out', 
+            selector: row => `${ moment(row.clock_out).local().format('hh:mm A')}`, 
+            conditionalCellStyles: [
+                {
+                    when: row => row.clock_out == null   ,
+                    style: {
+                        visibility: 'hidden'} 
+                }
+                
+            ],
+            sortable: true, center: true },
+    
+        {   name: 'Hours', 
+            selector:  row => `${ row.total_hours }`, 
+            sortable: true, center: true },
+        {
+            name: "Actions",
+            cell: row => <div style={{ display: 'flex' }}><Button onClick={() => handleSelectDay(row.id)}>Edit</Button> <Button color="error" onClick={() => handleDestroyTime(row.id)} ><DeleteIcon /></Button></div>,
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+            }
+    ];
+
 
     useEffect(() => {
         
@@ -109,6 +135,17 @@ const Home = () => {
           console.log(res)
         });
       }, []);
+
+    const handleClockin = ()=>{
+        setOpen(true);
+    }
+
+    const handleCLockout = ()=>{
+        console.log("clockedinDate", clockedinDate)
+        setSelected(null)
+        setSelectedDate(clockedinDate);
+        setOpen(true);
+    }
 
     const handleInTimeChange = date => {
         setSelected({ ...selected, clock_in: date});
@@ -206,47 +243,12 @@ const Home = () => {
           })
           location.reload();
     }
-
-    const columns = [
-    {
-        name: 'Date',
-        selector:  row => `${ moment(row.entry_date).format('MMMM Do YYYY') }`,
-        sortable: true,
-        center: true,
-        cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{moment(row.entry_date).format('MMMM Do YYYY')}</a>
-    },
-    {   name: 'Clock In', 
-        selector: row => `${ moment(row.clock_in).local().format('hh:mm A')}`, 
-        sortable: true, center: true 
-    },
-    {   
-        name: 'Clock Out', 
-        selector: row => `${ moment(row.clock_out).local().format('hh:mm A')}`, 
-        conditionalCellStyles: [
-            {
-                when: row => row.clock_out == null   ,
-                style: {
-                    visibility: 'hidden'} 
-            }
-            
-        ],
-        sortable: true, center: true },
-
-    {   name: 'Hours', 
-        selector:  row => `${ row.total_hours }`, 
-        sortable: true, center: true },
-    {
-        name: "Actions",
-        cell: row => <div style={{ display: 'flex' }}><Button onClick={() => handleSelectDay(row.id)}>Edit</Button> <Button color="error" onClick={() => handleDestroyTime(row.id)} ><DeleteIcon /></Button></div>,
-        ignoreRowClick: true,
-        allowOverflow: true,
-        button: true,
-        }
-    ];
     
     const currentDate = moment();
     const weekStart = currentDate.clone().startOf('isoWeek');
     const weekEnd = currentDate.clone().endOf('isoWeek');
+    moment(weekStart).format('MMMM Do YYYY')
+    
 
     return ( 
         <React.Fragment>
@@ -308,16 +310,15 @@ const Home = () => {
                     <CardContent>
                         <span className="today_date">Today Date: {moment().format('MMMM Do YYYY')}</span>
                         <Typography gutterBottom variant="p" component="div">
-                            Monthly working hours
+                            Monthly Balance : <strong>{monthlyHr} hours </strong>
                         </Typography>
-                        <Typography compoent='h5'>{monthlyHr}</Typography>
-                        
-                     
+
                         <Typography gutterBottom variant="p" component="div">
-                           
-                            Weekly working hours
+                            Current Week Balance
                         </Typography>
-                        <Typography compoent='h5'>{weeklyHr}</Typography>
+                        <Typography compoent='p'>{moment(weekStart).format('MMMM Do YYYY')} .. {moment(weekEnd).format('MMMM Do YYYY')}</Typography>
+
+                        <Typography compoent='h5'><strong>{weeklyHr} hours </strong></Typography>
     
                     </CardContent>
                  
@@ -397,15 +398,14 @@ const Home = () => {
                 <Typography gutterBottom variant="h5" component="div">
                        TimeCard
                 </Typography>
-
-
+             
                 <DataTable 
-                    columns={columns} 
-                    data={data} 
-                    pagination 
-                    highlightOnHover 
-                    customStyles={tableStyles}
-                    />
+                        columns={columns} 
+                        data={data} 
+                        pagination 
+                        highlightOnHover 
+                        customStyles={tableStyles}
+                />
                 </>
             )}
 

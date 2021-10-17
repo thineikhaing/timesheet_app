@@ -14,8 +14,34 @@
  *= require_self
  */
 
+// GOOGLE FONTS
+// ------------
+
+@import url('https://fonts.googleapis.com/css?family=Bree+Serif');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400');
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+// FONTS
+// -----
+
+$font--bree       : "Bree Serif", serif;
+$font--montserrat : "Montserrat", sans-serif;
+
+
  body{
      margin: 0 !important;
+     padding: 0;
+     font-size: 62.5%;
+     font-family: $font--montserrat !important;
+     font-weight: 400;
+ }
+
+ .MuiTypography-root,.MuiButton-root,.MuiInputLabel-root,.MuiInputBase-input{
+     font-family: $font--montserrat !important;
+     font-weight: 400;
  }
 .userIcon{
     display: flex;

@@ -48,7 +48,7 @@ const tableStyles = {
     headCells: {
       style: {
         fontSize: '1rem',
-        fontWeight: '500',
+        fontWeight: '600',
         textTransform: 'uppercase',
         // paddingLeft: '0 8px'
       },
@@ -59,7 +59,8 @@ const tableStyles = {
         // paddingLeft: '0 8px',
       },
     },
-  };
+};
+
 
 const Home = () => {
     const [currentUser] = useContext(MainContext)  
@@ -67,6 +68,7 @@ const Home = () => {
     const [open, setOpen] = React.useState(false);
     const [openalert, setAlertOpen] = React.useState(false);
     const [openalert1, setAlertOpen1] = React.useState(false);
+    const [openalert2, setAlertOpen2] = React.useState(false);
 
     const [selectedDate, setSelectedDate] = React.useState(new Date());
     
@@ -82,6 +84,7 @@ const Home = () => {
 
     const handleCLockout = ()=>{
         console.log("clockedinDate", clockedinDate)
+        setSelected(null)
         setSelectedDate(clockedinDate);
         setOpen(true);
     }
@@ -94,8 +97,6 @@ const Home = () => {
     const [monthlyHr, setMonthlyHr] = useState('00:00');
 
     useEffect(() => {
-        var timezone = moment.tz.guess();
-        console.log("timezone", timezone)
         
         api.get('/get_timesheet').then(({data}) => {
             setData(data.clock_event);
@@ -167,18 +168,23 @@ const Home = () => {
         }
 
         if(addEntry){
-            var timeoffset = moment().format('ZZ')
-            var timezone = moment.tz.guess();
-            console.log("timezone", timezone)
-            console.log(selectedDate)
 
-            await api.post('/create_clock_event', { dateTime: selectedDate,timezone: timezone,timeoffset:timeoffset}).then(res => {
+            await api.post('/create_clock_event', { dateTime: selectedDate}).then(res => {
                 console.log(res)
+                    console.log(res)
+                    var overlapTime = res.data.overlapTime
+                    if (overlapTime == true){
+                        setAlertOpen2(true);
+                    }
+                    else{
+                        location.reload(); 
+                    }
                     handleClose();
                 }).catch(res => {
                 console.log('Something wrong');
             })
-            location.reload(); 
+
+            // 
         }
     
     }
@@ -192,35 +198,70 @@ const Home = () => {
           location.reload();
     }
 
-      const columns = [
-        {
-          name: 'Date',
-          selector:  row => `${ row.clock_in_date }`,
-          sortable: true,
-          center: true,
-          cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{row.clock_in_date}</a>
-        },
-        { name: 'Clock In', selector: row => `${ 
-            moment(row.clock_in).local().format('hh:mm A')
-        }`, sortable: true, center: true },
-        { name: 'Clock Out', selector: row => `${ 
-            moment(row.clock_out_time).local().format('hh:mm A')
-        }`, sortable: true, center: true },
-        { name: 'Hours', selector:  row => `${ row.total_hours }`, sortable: true, center: true },
-        {
-            name: "Actions",
-            cell: row => <div style={{ display: 'flex' }}><Button onClick={() => handleSelectDay(row.id)}>Edit</Button> <Button color="error" onClick={() => handleDestroyTime(row.id)} ><DeleteIcon /></Button></div>,
-            ignoreRowClick: true,
-            allowOverflow: true,
-            button: true,
-          }
-      ];
+    const columns = [
+    {
+        name: 'Date',
+        selector:  row => `${ moment(row.entry_date).format('MMMM Do YYYY') }`,
+        sortable: true,
+        center: true,
+        cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{moment(row.entry_date).format('MMMM Do YYYY')}</a>
+    },
+    {   name: 'Clock In', 
+        selector: row => `${ moment(row.clock_in).local().format('hh:mm A')}`, 
+        sortable: true, center: true 
+    },
+    {   
+        name: 'Clock Out', 
+        selector: row => `${ moment(row.clock_out).local().format('hh:mm A')}`, 
+        conditionalCellStyles: [
+            {
+                when: row => row.clock_out == null   ,
+                style: {
+                    visibility: 'hidden'} 
+            }
+            
+        ],
+        sortable: true, center: true },
 
+    {   name: 'Hours', 
+        selector:  row => `${ row.total_hours }`, 
+        sortable: true, center: true },
+    {
+        name: "Actions",
+        cell: row => <div style={{ display: 'flex' }}><Button onClick={() => handleSelectDay(row.id)}>Edit</Button> <Button color="error" onClick={() => handleDestroyTime(row.id)} ><DeleteIcon /></Button></div>,
+        ignoreRowClick: true,
+        allowOverflow: true,
+        button: true,
+        }
+    ];
+    
+    const currentDate = moment();
+    const weekStart = currentDate.clone().startOf('isoWeek');
+    const weekEnd = currentDate.clone().endOf('isoWeek');
 
     return ( 
         <React.Fragment>
         <CssBaseline />
+        <Collapse in={openalert2}>
+            <Alert severity="error"
+            action={
+                <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                    setAlertOpen2(false);
+                }}
+                >
+                <CloseIcon fontSize="inherit" />
+                </IconButton>
+            }
+            sx={{ mb: 2 }}
+            >  
+            <AlertTitle>Please enter avalid Time. </AlertTitle>
 
+            </Alert>
+        </Collapse>
         <Container className="home_container">
             <Stack direction="row" spacing={2}>
                 <Card sx={{ width: '35%' }}>
@@ -256,12 +297,15 @@ const Home = () => {
 
                 <Card sx={{ width: '65%' }}>
                     <CardContent>
+                        <span className="today_date">Today Date: {moment().format('MMMM Do YYYY')}</span>
                         <Typography gutterBottom variant="p" component="div">
                             Monthly working hours
                         </Typography>
                         <Typography compoent='h5'>{monthlyHr}</Typography>
-
+                        
+                     
                         <Typography gutterBottom variant="p" component="div">
+                           
                             Weekly working hours
                         </Typography>
                         <Typography compoent='h5'>{weeklyHr}</Typography>
@@ -280,28 +324,30 @@ const Home = () => {
                     <div className="selected-day">
                     
                     <Typography className="selected_date" variant="h5">
-                    { selected.clock_in_date }
+                    { 
+                        moment(selected.entry_date).format('MMMM Do YYYY')
+                    }
                     </Typography>
                     <br/>
                     <Collapse in={openalert1}>
-                            <Alert severity="error"
-                            action={
-                                <IconButton
-                                aria-label="close"
-                                color="inherit"
-                                size="small"
-                                onClick={() => {
-                                    setAlertOpen1(false);
-                                }}
-                                >
-                                <CloseIcon fontSize="inherit" />
-                                </IconButton>
-                            }
-                            sx={{ mb: 2 }}
-                            >  
-                            <AlertTitle>Please enter avalid Time. </AlertTitle>
-                            Clock out time should <strong> after clock in time.</strong>
-                            </Alert>
+                        <Alert severity="error"
+                        action={
+                            <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setAlertOpen1(false);
+                            }}
+                            >
+                            <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                        sx={{ mb: 2 }}
+                        >  
+                        <AlertTitle>Please enter avalid Time. </AlertTitle>
+                        Clock out time should <strong> after clock in time.</strong>
+                        </Alert>
                     </Collapse>
                     <Container maxWidth="sm">
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -344,7 +390,13 @@ const Home = () => {
                 </Typography>
 
 
-                <DataTable columns={columns} data={data} pagination highlightOnHover customStyles={tableStyles}/>
+                <DataTable 
+                    columns={columns} 
+                    data={data} 
+                    pagination 
+                    highlightOnHover 
+                    customStyles={tableStyles}
+                    />
                 </>
             )}
 

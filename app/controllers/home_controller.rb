@@ -21,32 +21,36 @@ class HomeController < ApplicationController
   end
 
   def create_clock_event
-   
-    p "user timezone"
-    p entryTime = params[:dateTime]
-    p timezone = params[:timezone]
-
+    isInbtwTime = false
+    entryTime = params[:dateTime]
     if entryTime
       dateTime = DateTime.parse(entryTime).utc
     else
       dateTime = DateTime.now
     end
-
-    p dateTime
     
-    # dateTime= dateTime.in_time_zone(timezone)
-
-    
+    check_arr = []
     clock_event = current_user.clock_events.where(entry_date: dateTime,clocking_in: true).take 
     if clock_event.present?
       p "set clock out time"
       clock_event = clock_event.update(clock_out: dateTime,clocking_in: false)
     else
-      p "creat new clock in time"
-      clock_event = ClockEvent.create(user_id: current_user.id, entry_date: dateTime, clock_in: dateTime,clocking_in: true) unless clock_event.present?
+      prev_events = current_user.clock_events.where(entry_date: dateTime,clocking_in: false)
+      prev_events.each do |event|
+        p start_time = event.clock_in
+        p end_time = event.clock_out
+        check_arr.push((start_time..end_time).cover?(dateTime))
+      end
+
+      isInbtwTime = check_arr.include?(true)
+
+      if isInbtwTime == false
+        clock_event = ClockEvent.create(user_id: current_user.id, entry_date: dateTime, clock_in: dateTime,clocking_in: true)   
+      end
     end
+    
    
-    render json: current_user.clock_events, status: :ok
+    render json: {clock_event: current_user.clock_events, overlapTime: isInbtwTime}, status: :ok
   end
 
   def edit_clockevent

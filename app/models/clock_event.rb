@@ -3,7 +3,7 @@ class ClockEvent < ApplicationRecord
     validates :entry_date, :clock_in, presence: true
     
     def as_json(options=nil)
-        super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:clock_in_date, :clock_out_time,:total_hours])
+        super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:total_hours])
     end
 
     scope :current_month, ->{
@@ -26,20 +26,6 @@ class ClockEvent < ApplicationRecord
         where("EXTRACT(DOW FROM clocked_in) in (?)", 1..5)
     }
 
-    def clock_in_date
-        if self.entry_date.present?
-            self.entry_date.strftime("%d %B %Y") 
-        end
-    end
-
-
-    def clock_out_time
-        if self.clock_out.present?
-            self.clock_out
-        else
-            ""
-        end
-    end
 
     def worked_hr
         if self.clock_in.present? && self.clock_out.present?

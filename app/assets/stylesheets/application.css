@@ -40,18 +40,20 @@ th{
 }
 
 .selected-day {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 18px;
     text-align: center;
-    padding: 8px;
 }
 
 .selected_date{
-    background-color: #2EACBA;
+    /* background-color: #2EACBA;
     width: 297px;
     padding: 10px;
     border-radius: 10px;
     display: inline-block;
     margin-bottom: 20px !important;
-    color: #fff;
+    color: #fff; */
     font-size: 22px;
     font-weight: 500;
 }
@@ -60,4 +62,18 @@ th{
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 8px 0px;
 }
+
+.form_title{
+    padding: 8px 0px;
+    font-size: 20px !important;
+}
+
+.submit_btn{
+    background: rgb(46, 172, 186) !important;
+  }
+
+  .MuiAlert-message{
+      text-align: left !important
+  }

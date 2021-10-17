@@ -3,11 +3,28 @@ class HomeController < ApplicationController
   def index
   end
 
+  def get_timesheet
+    isClockingin = false
+    clockedinDate = DateTime.now
+    clock_events = current_user.clock_events.select(:id, :entry_date, :clock_in, :clock_out).order("entry_date DESC")
+    p check_clocking_in = current_user.clock_events.where(clocking_in: true).take
+    if check_clocking_in.present?
+      isClockingin = true
+      clockedinDate = check_clocking_in.clock_in
+    end
+    # timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
+    monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
+    weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
+    today = Date.today # Today's date
+    current_week = (today.at_beginning_of_week..today.at_end_of_week)
+    render json: {clock_event: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 
+  end
+
   def create_clock_event
     entryTime = params[:dateTime]
 
     if entryTime
-      dateTime = entryTime #DateTime.parse entryTime
+      dateTime = DateTime.parse entryTime
     else
       dateTime = DateTime.now
     end
@@ -25,18 +42,6 @@ class HomeController < ApplicationController
     render json: current_user.clock_events, status: :ok
   end
 
-  def get_timesheet
-    isClockingin = false
-    clock_events = current_user.clock_events.select(:id, :entry_date, :clock_in, :clock_out).order("entry_date DESC")
-    p check_clocking_in = current_user.clock_events.where(clocking_in: true).take
-    if check_clocking_in.present?
-      isClockingin = true
-    end
-    # timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
-    render json: {clock_event: clock_events, isClockingin: isClockingin, status: 200 } 
-
-  end
-
   def edit_clockevent
     clock_event = ClockEvent.find(params[:id])
     render json: clock_event.to_json
@@ -46,6 +51,11 @@ class HomeController < ApplicationController
     clock_event = ClockEvent.find(params[:id])
     clock_event.update(clock_in: params[:clock_in], clock_out: params[:clock_out])
     render json: clock_event.to_json
+  end
+
+  def delete_clockevent
+    ClockEvent.find(params[:id]).destroy
+    render json: {}, status: :ok
   end
 
 end

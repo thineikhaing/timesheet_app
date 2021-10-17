@@ -13,7 +13,7 @@ export default function SignUp() {
         <CardContent>
           {/* <AccessTimeIcon className="clock-icon" /> */}
           <Typography variant="h5" component="h2">Timesheet Application</Typography>
-          <Typography component="p">Sign Up</Typography>
+          <Typography className="form_title" component="p">Sign Up</Typography>
           <LoginForm>
             <TextField name="user[username]" label="Username" />
             <br/>
@@ -24,11 +24,11 @@ export default function SignUp() {
             <TextField type="password" name="user[password_confirmation]" label="Password Confirmation" />
             <div className="button-group">
              
-              <Button type="submit" variant="contained" color="primary">
+              <Button className="submit_btn" type="submit" variant="contained" color="warning">
                 Sign Up
               </Button>
 
-              <Button href="/users/sign_in" type="link">
+              <Button className="text_btn" href="/users/sign_in" type="link" color="warning">
                 Login
               </Button>
               
@@ -48,13 +48,18 @@ export const Container = styled.div`
   align-items: center;
   justify-content: center;
 
-  .clock-icon {
-    font-size:60px;
+  .submit_btn{
+    background: rgb(46, 172, 186) !important;
+  }
+  .text_btn{
+    color: rgb(46, 172, 186) !important;
   }
 
   .card{
-    min-width: 30%;
-    text-align:center;
+    min-width: 360px;
+    text-align: center;
+    padding: 50px;
+    margin-top: 60px;
   }
 
   .button-group{

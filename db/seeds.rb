@@ -11,10 +11,6 @@ def random_hour(from, to)
     ((rand((Date.today - 15)..Date.today)) + rand(from..to).hour + rand(0..60).minutes).to_datetime
 end
 
-def check_out_date(check_in_date, from, to)
-    (check_in_date.to_date + rand(from..to).hour ).to_datetime
-end
-
 # Delete all existing records.
 User.delete_all
 ClockEvent.delete_all
@@ -35,7 +31,6 @@ employee = User.new(email: 'employee@example.com', password: 'password', passwor
 employee.save!
 
 20.times do
-    randHr = 
     check_in_date = random_hour(8, 9)
     employee.clock_events.create(
         entry_date: check_in_date,

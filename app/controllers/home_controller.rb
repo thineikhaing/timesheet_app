@@ -1,6 +1,7 @@
 class HomeController < ApplicationController
   before_action :authenticate_user!
   def index
+    # render role_template
   end
 
   def get_timesheet

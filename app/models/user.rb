@@ -7,4 +7,6 @@ class User < ApplicationRecord
   enum role: {admin: 0, user: 1}
   validates :username, :email, presence: true
   has_many :clock_events, dependent: :destroy
+
+  
 end

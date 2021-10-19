@@ -27,40 +27,7 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import AlertTitle from '@mui/material/AlertTitle';
 
-const modalStyle = {
-  position: 'absolute',
-  top: '21%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 500,
-  maxWidth: 500,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
-
-const tableStyles = {
-    rows: {
-      style: {
-        minHeight: '52px', // override the row height
-      }
-    },
-    headCells: {
-      style: {
-        fontSize: '1rem',
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        // paddingLeft: '0 8px'
-      },
-    },
-    cells: {
-      style: {
-        fontSize: '1rem',
-        // paddingLeft: '0 8px',
-      },
-    },
-};
-
+const Export = ({ onExport }) => <Button variant="contained" className="submit_btn" onClick={e => onExport(e.target.value)}>Export</Button>;
 
 const Home = () => {
     const [currentUser] = useContext(MainContext)  
@@ -84,21 +51,71 @@ const Home = () => {
     const [weeklyHr, setWeeklyHr] = useState('00:00');
     const [monthlyHr, setMonthlyHr] = useState('00:00');
 
+    const downloadCSV = () =>{
+
+        api.get('/get_timesheet').then(({data}) => {
+            const clockData = data.clock_event;
+
+            const link = document.createElement('a');
+            let csv = convertArrayOfObjectsToCSV(clockData);
+            if (csv == null) return;
+
+            const filename = 'export.csv';
+
+            if (!csv.match(/^data:text\/csv/i)) {
+                csv = `data:text/csv;charset=utf-8,${csv}`;
+            }
+
+            link.setAttribute('href', encodeURI(csv));
+            link.setAttribute('download', filename);
+            link.click();
+            
+        }).catch(res => {
+          console.log(res)
+        });
+
+    }
+    
+    const convertArrayOfObjectsToCSV = (array) => {
+        let result;
+        const columnDelimiter = ',';
+        const lineDelimiter = '\n';
+        const keys = Object.keys(array[0]);
+
+        result = '';
+        result += keys.join(columnDelimiter);
+        result += lineDelimiter;
+
+        array.forEach(item => {
+            let ctr = 0;
+            keys.forEach(key => {
+                if (ctr > 0) result += columnDelimiter;
+
+                result += item[key];
+                
+                ctr++;
+            });
+            result += lineDelimiter;
+        });
+
+        return result;
+    }
+
     const columns = [
         {
             name: 'Date',
-            selector:  row => `${ moment(row.entry_date).format('MMMM Do YYYY') }`,
+            selector:  row => `${ moment(row.entry_date).format(' MMMM Do YYYY') }`,
             sortable: true,
             center: true,
             cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{moment(row.entry_date).format('MMMM Do YYYY')}</a>
         },
         {   name: 'Clock In', 
-            selector: row => `${ moment(row.clock_in).local().format('hh:mm A')}`, 
+            selector: row => `${ moment(row.clock_in).local().format(' hh:mm A')}`, 
             sortable: true, center: true 
         },
         {   
             name: 'Clock Out', 
-            selector: row => `${ moment(row.clock_out).local().format('hh:mm A')}`, 
+            selector: row => `${ moment(row.clock_out).local().format(' hh:mm A')}`, 
             conditionalCellStyles: [
                 {
                     when: row => row.clock_out == null   ,
@@ -121,7 +138,6 @@ const Home = () => {
             }
     ];
 
-
     useEffect(() => {
         
         api.get('/get_timesheet').then(({data}) => {
@@ -134,7 +150,11 @@ const Home = () => {
         }).catch(res => {
           console.log(res)
         });
-      }, []);
+    }, []);
+
+    const actionsMemo = useMemo(() => 
+        <Export onExport={() => downloadCSV()} />, []
+     );
 
     const handleClockin = ()=>{
         setOpen(true);
@@ -199,6 +219,7 @@ const Home = () => {
           console.log('error', res)
         })
     }
+    
     const handleAddEntry = async () => {
 
         var addEntry = true
@@ -247,7 +268,6 @@ const Home = () => {
     const currentDate = moment();
     const weekStart = currentDate.clone().startOf('isoWeek');
     const weekEnd = currentDate.clone().endOf('isoWeek');
-    moment(weekStart).format('MMMM Do YYYY')
     
 
     return ( 
@@ -405,6 +425,7 @@ const Home = () => {
                         pagination 
                         highlightOnHover 
                         customStyles={tableStyles}
+                        actions={actionsMemo}
                 />
                 </>
             )}
@@ -466,7 +487,7 @@ const Home = () => {
                 </Stack>
             </LocalizationProvider>
             <br/>
-            <Button variant="contained" onClick={handleAddEntry} className="submit_btn" color="success">Add</Button>
+            <Button variant="contained" onClick={handleAddEntry} className="submit_btn" color="success" style={{display: 'inline-block',float: "right"}}>Add</Button>
 
             </Box>
         </Modal>
@@ -478,3 +499,38 @@ const Home = () => {
 }
 
 export default Home;
+
+
+const modalStyle = {
+    position: 'absolute',
+    top: '21%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 500,
+    maxWidth: 500,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+  };
+  
+  const tableStyles = {
+      rows: {
+        style: {
+          minHeight: '52px', // override the row height
+        }
+      },
+      headCells: {
+        style: {
+          fontSize: '1rem',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          // paddingLeft: '0 8px'
+        },
+      },
+      cells: {
+        style: {
+          fontSize: '1rem',
+          // paddingLeft: '0 8px',
+        },
+      },
+  };

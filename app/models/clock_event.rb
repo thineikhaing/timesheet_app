@@ -15,6 +15,7 @@ class ClockEvent < ApplicationRecord
         start = Time.zone.now 
         where(clock_in: start.beginning_of_week..start.end_of_week)
     }
+
     scope :payroll_week, ->{
         start = Time.zone.now.beginning_of_week
         ending = start.end_of_week + 7.days 

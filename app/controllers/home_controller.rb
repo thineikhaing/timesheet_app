@@ -12,9 +12,11 @@ class HomeController < ApplicationController
       isClockingin = true
       clockedinDate = check_clocking_in.clock_in
     end
+    
     # timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
     monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
     weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
+
     today = Date.today # Today's date
     current_week = (today.at_beginning_of_week..today.at_end_of_week)
     render json: {clock_event: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 

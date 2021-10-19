@@ -411,7 +411,7 @@ const Home = () => {
                 </Paper>
           }
 
-
+        <Paper className="timecard">
             {data && (
                 <>
                 <br/>
@@ -429,7 +429,7 @@ const Home = () => {
                 />
                 </>
             )}
-
+        </Paper>
         </Container>
 
 

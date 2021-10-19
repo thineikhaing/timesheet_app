@@ -32,6 +32,53 @@ import Toolbar from '@mui/material/Toolbar';
 const AdminDashboard = () => {
     const [currentUser] = useContext(MainContext)  
     const [data, setData] = useState([]);
+
+    useEffect(() => {
+        
+        api.get('/initial_retrieve').then(({data}) => {
+            setData(data.users);
+            console.log(data.users)
+            // setClockingin(data.isClockingin)
+            // setClockedinDate(data.clockedinDate)
+            // setMonthlyHr(data.monthly_hrs)
+            // setWeeklyHr(data.weekly_hrs)
+            
+        }).catch(res => {
+          console.log(res)
+        });
+    }, []);
+
+    const handleSelect = (id) =>{}
+
+    const columns = [
+        {
+            name: 'ID',
+            selector:  row => `${ row.id }`,
+            sortable: true,
+            center: true,
+            cell: row => <a className="date-click" onClick={() => handleSelect(row.id)}>{row.id-1}</a>
+        },
+        {   name: 'User Name', 
+            selector: row => `${ row.username}`, 
+            sortable: true, center: true 
+        },
+        {   
+            name: 'Email', 
+            selector: row => `${ row.email}`,
+            sortable: true, center: true },
+    
+        {   name: 'Status', 
+            selector:  row => `${ row.clocked_in_status }`, 
+            sortable: true, center: true },
+        {
+            name: "Actions",
+            cell: row => <div style={{ display: 'flex' }}><Button onClick={() => handleSelect(row.id)}>Edit</Button> </div>,
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+            }
+    ];
+
     return ( 
         <React.Fragment>
         <CssBaseline />
@@ -52,7 +99,27 @@ const AdminDashboard = () => {
                 
                     </CardContent>
                     
-                </Card>  
+            </Card>
+            <br/> 
+            <Paper style={{padding: "12px"}}>
+            {data && (
+                <>
+                <br/>
+                <Typography gutterBottom variant="h5" component="div">
+                       Total Staffs: <strong>{data.length-1}</strong>
+                </Typography>
+             
+                <DataTable 
+                        columns={columns} 
+                        data={data} 
+                        pagination 
+                        highlightOnHover 
+                        customStyles={tableStyles}
+                />
+                </>
+            )}
+            
+            </Paper> 
 
             </Box>
         </Box>

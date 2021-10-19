@@ -46,6 +46,7 @@ Create and migrate database and start the server.
 $ rails db:create db:migrate
 $ rails s
 $ rake db:seed
+$ rake defaultusers_setup:fill_database
 ```
 
 To access the application as an administrator, use the following account:

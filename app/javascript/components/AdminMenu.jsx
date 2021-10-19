@@ -37,7 +37,7 @@ function ResponsiveDrawer(props) {
     })
     location.reload();
   }
-  
+
   const drawer = (
     <div>
       <Toolbar />
@@ -47,10 +47,10 @@ function ResponsiveDrawer(props) {
             <ListItemIcon><HomeIcon /></ListItemIcon>
             <ListItemText primary='Dashboard' />
         </ListItem>
-        <ListItem button component="a" href="/staff">
+        {/* <ListItem button component="a" href="/staff">
             <ListItemIcon><PeopleIcon /></ListItemIcon>
             <ListItemText primary='Staff' />
-        </ListItem>
+        </ListItem> */}
         <ListItem button component="a" href="/attendence">
             <ListItemIcon><StackedBarChartIcon /></ListItemIcon>
             <ListItemText primary='Attendence' />

@@ -38,8 +38,13 @@ class ClockEvent < ApplicationRecord
     def total_hours
         if self.clock_in.present? && self.clock_out.present?
             total_hours = (self.clock_out.to_f - self.clock_in.to_f) / 3600 
-            total_hours.round(1)
-            return "#{total_hours.round(1)} Hours"
+            if total_hours > 1
+                total_hours.round(1)
+                return "#{total_hours.round(1)} Hours"
+            else
+                total_seconds = (self.clock_out.to_f - self.clock_in.to_f) / 60 
+                return "#{total_seconds.round(0)} Minutes"
+            end
         else
             return ""
         end

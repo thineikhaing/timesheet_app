@@ -26,6 +26,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import AlertTitle from '@mui/material/AlertTitle';
+import { Divider } from "@mui/material";
 
 const Export = ({ onExport }) => <Button variant="contained" className="submit_btn" onClick={e => onExport(e.target.value)}>Export</Button>;
 
@@ -99,7 +100,7 @@ const Home = () => {
 
         return result;
     }
-
+    
     const columns = [
         {
             name: 'Date',
@@ -162,7 +163,7 @@ const Home = () => {
     const handleCLockout = ()=>{
         console.log("clockedinDate", clockedinDate)
         setSelected(null)
-        setSelectedDate(clockedinDate);
+        setSelectedDate(new Date());
         setOpen(true);
     }
 
@@ -217,6 +218,11 @@ const Home = () => {
         }).catch(res => {
           console.log('error', res)
         })
+    }
+
+    const handleClockinnow =()=>{
+        setSelectedDate(new Date())
+        handleAddEntry()
     }
     
     const handleAddEntry = async () => {
@@ -294,24 +300,29 @@ const Home = () => {
         </Collapse>
         <Container className="home_container">
             <Stack direction="row" spacing={2}>
-                <Card sx={{ width: '35%' }}>
+                <Card sx={{ width: '60%' }}>
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
                             Welcome, {currentUser.username}
                         </Typography>
                         <Typography compoent='p'>{currentUser.email}</Typography>
-                        {/* <Typography variant="body2" color="text.secondary">
-                            Check out the current clock in/out events, or create a new one.
-                        </Typography> */}
-                    </CardContent>
-                    <CardActions>
+
                         { clockingin &&
+                            <Typography className="clockedin_ago" variant="subtitle1" gutterBottom component="div">Clocked in {moment(clockedinDate).fromNow()}</Typography>
+                        }
+                      
+                    </CardContent>
+                    <CardActions style={{marginBottom: "20px",padding: "8px 16px"}}>
+                        { clockingin &&
+                            <>
+                     
                             <Button variant="contained" color="error" onClick={handleCLockout} startIcon={<AlarmAddIcon />}>
                                 Clock Out
                             </Button>
+                            </>
                         }
                         { clockingin == false &&
-                            <Button variant="contained" color="warning" onClick={handleAddEntry} startIcon={<AlarmAddIcon />}>
+                            <Button variant="contained" color="warning" onClick={handleClockinnow} startIcon={<AlarmAddIcon />}>
                                 Clock In
                             </Button>
 
@@ -325,7 +336,7 @@ const Home = () => {
                     </CardActions>
                 </Card>  
 
-                <Card sx={{ width: '65%' }}>
+                <Card sx={{ width: '40%' }}>
                     <CardContent>
                         <span className="today_date">Today Date: {moment().format('MMMM Do YYYY')}</span>
                         <Typography gutterBottom variant="p" component="div">
@@ -440,7 +451,14 @@ const Home = () => {
         >
             <Box sx={modalStyle}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-                Select the date and time.
+            { clockingin &&
+                 <>Select the Clock out time.</>
+            }
+
+            { clockingin == false &&
+               <>Select the Date and Time.</>
+            }
+                
             </Typography>
             <br/>
             
@@ -459,7 +477,8 @@ const Home = () => {
                     </IconButton>
                 }
                 sx={{ mb: 2 }}
-                >  
+                > 
+              
                 <AlertTitle>Please enter avalid Time. </AlertTitle>
                 Clock out time should <strong> after clock in time.</strong>
                 </Alert>
@@ -468,14 +487,28 @@ const Home = () => {
 
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <Stack spacing={3}>
-                    <DesktopDatePicker
-                    label="Date"
-                    inputFormat="MM/dd/yyyy"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    maxDate={new Date()}  //maxDate
-                    renderInput={(params) => <TextField {...params} />}
-                    />
+                { clockingin &&
+                   <>
+                   {<Typography className="clockedin_ago" variant="subtitle1" gutterBottom component="div">
+           
+                        Clocked in: {moment(clockedinDate).local().format('MMMM Do YYYY hh:mm A')}
+
+                       </Typography>}
+                   </>
+                } 
+                {clockingin == false &&
+                      <>
+                      <DesktopDatePicker
+                            label="Date"
+                            inputFormat="MM/dd/yyyy"
+                            value={selectedDate}
+                            onChange={handleDateChange}
+                            maxDate={new Date()}  //maxDate
+                            renderInput={(params) => <TextField {...params} />}
+                            />
+                      </>
+                }
+                    
                     <TimePicker
                     label="Time"
                     value={selectedDate}

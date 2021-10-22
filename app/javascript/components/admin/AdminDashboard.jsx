@@ -1,35 +1,19 @@
 import React, { useContext ,useState, useEffect,useMemo} from "react";
-import { MainContext } from "./UserProvider";
+import { MainContext } from "../UserProvider";
 import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import TimePicker from '@mui/lab/TimePicker';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import DataTable from 'react-data-table-component';
 import Paper from '@mui/material/Paper';
-import AlarmAddIcon from '@mui/icons-material/AlarmAdd';
-import DeleteIcon from '@mui/icons-material/Delete';
-import api from "./Api";
-import moment from 'moment-timezone';
-import Alert from '@mui/material/Alert';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import Collapse from '@mui/material/Collapse';
-import AlertTitle from '@mui/material/AlertTitle';
+import api from "../Api";
 import ResponsiveDrawer from "./AdminMenu";
 import Toolbar from '@mui/material/Toolbar';
+import { withRouter } from "react-router-dom";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ history }) => {
     const [currentUser] = useContext(MainContext)  
     const [data, setData] = useState([]);
 
@@ -37,23 +21,19 @@ const AdminDashboard = () => {
         
         api.get('/initial_retrieve').then(({data}) => {
             setData(data.users);
-            console.log(data.users)
-            // setClockingin(data.isClockingin)
-            // setClockedinDate(data.clockedinDate)
-            // setMonthlyHr(data.monthly_hrs)
-            // setWeeklyHr(data.weekly_hrs)
-            
         }).catch(res => {
           console.log(res)
         });
     }, []);
 
-    const handleSelect = (id) =>{}
+    const handleSelect = (id) =>{
+      history.push(`/user_attendence/${id}`)
+    }
 
     const columns = [
         {
-            name: 'ID',
-            selector:  row => `${ row.id }`,
+            name: 'User Name',
+            selector:  row => `${ row.username }`,
             sortable: true,
             center: true,
             cell: row => <a className="date-click" onClick={() => handleSelect(row.id)}>{row.id-1}</a>
@@ -106,7 +86,12 @@ const AdminDashboard = () => {
                 <>
                 <br/>
                 <Typography gutterBottom variant="h5" component="div">
-                       Total Staffs: <strong>{data.length-1}</strong>
+                    {data.length > 1 &&
+                    <>
+                        Total Staffs: <strong>{data.length-1}</strong>
+                    </>
+                    }
+                       
                 </Typography>
              
                 <DataTable 
@@ -129,7 +114,7 @@ const AdminDashboard = () => {
 
 }
 
-export default AdminDashboard;
+export default withRouter(AdminDashboard);
 
 
 const modalStyle = {
@@ -161,6 +146,7 @@ const modalStyle = {
       cells: {
         style: {
           fontSize: '1rem',
+          textAlign: 'left'
           // paddingLeft: '0 8px',
         },
       },

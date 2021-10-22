@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :clock_events, dependent: :destroy
 
   def as_json(options=nil)
-    super(only: [:id, :username, :email, :role], methods: [:clocked_in_status])
+    super(only: [:id, :username, :email, :role,:last_sign_in_at], methods: [:clocked_in_status])
 end
 
   def clocked_in_status

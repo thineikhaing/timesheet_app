@@ -52,9 +52,8 @@ const Home = () => {
     const [monthlyHr, setMonthlyHr] = useState('00:00');
 
     const downloadCSV = () =>{
-
         api.get('/get_timesheet').then(({data}) => {
-            const clockData = data.clock_event;
+            const clockData = data.clock_events;
 
             const link = document.createElement('a');
             let csv = convertArrayOfObjectsToCSV(clockData);
@@ -140,8 +139,8 @@ const Home = () => {
 
     useEffect(() => {
         
-        api.get('/get_timesheet').then(({data}) => {
-            setData(data.clock_event);
+        api.get('/get_timesheet/').then(({data}) => {
+            setData(data.clock_events);
             setClockingin(data.isClockingin)
             setClockedinDate(data.clockedinDate)
             setMonthlyHr(data.monthly_hrs)
@@ -320,7 +319,7 @@ const Home = () => {
                         }
                         { clockingin == false &&
                             <Button variant="contained" color="warning" onClick={handleClockin} startIcon={<AlarmAddIcon />}>
-                                Clock In & Edit
+                                Clock In & Select
                             </Button>
                         }
                     </CardActions>

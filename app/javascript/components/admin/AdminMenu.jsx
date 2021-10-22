@@ -15,7 +15,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import api from './Api';
+import api from '../Api';
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import Link from '@mui/material/Link';
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart';

@@ -9,24 +9,35 @@ class HomeController < ApplicationController
     clockedinDate = DateTime.now
     clock_events = current_user.clock_events.select(:id, :entry_date, :clock_in, :clock_out).order("entry_date DESC")
     p check_clocking_in = current_user.clock_events.where(clocking_in: true).take
+
     if check_clocking_in.present?
       isClockingin = true
       clockedinDate = check_clocking_in.clock_in
     end
-    # timelogs = clock_events.group_by{ |item| item.entry_date.to_date }
+
     monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
     weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
 
     today = Date.today # Today's date
     current_week = (today.at_beginning_of_week..today.at_end_of_week)
-    render json: {clock_event: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 
+
+    render json: {clock_events: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 
+  end
+
+  def get_user_clockevents
+    staff = User.find(params[:id])
+    clock_events = staff.clock_events.select(:id, :entry_date, :clock_in, :clock_out).order("entry_date DESC")
+
+    monthly_worked_hours = staff.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
+    weekly_worked_hours = staff.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
+
+    render json: {user: staff,clock_events: clock_events,monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours, status: 200 } 
+
   end
 
   def initial_retrieve
-
     users = User.where(role: 1).order("id ASC")
     render json: {users: users}
-
   end
 
   def create_clock_event

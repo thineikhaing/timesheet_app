@@ -1,11 +1,11 @@
 import React, { useContext ,useState, useEffect} from "react";
-import { MainContext } from "./UserProvider";
+import { MainContext } from "../UserProvider";
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import api from "./Api";
+import api from "../Api";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import styled from 'styled-components'

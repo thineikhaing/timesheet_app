@@ -4,7 +4,6 @@ import Routes from "./Route";
 import AdminRoutes from "./AdminRoute";
 import UserProvider from "./UserProvider";
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import MenuAppBar from "./TopHeader";
 
 const App = ({ current_user }) =>(

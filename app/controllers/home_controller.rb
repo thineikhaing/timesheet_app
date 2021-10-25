@@ -15,8 +15,8 @@ class HomeController < ApplicationController
       clockedinDate = check_clocking_in.clock_in
     end
 
-    monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+).round(2)
-    weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+).round(2)
+    monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
+    weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
     business_days_hours = current_user.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+)
 
     today = Date.today # Today's date
@@ -56,7 +56,6 @@ class HomeController < ApplicationController
     if clock_event.present?
       clock_event = clock_event.update(clock_out: dateTime,clocking_in: false)
     else
-
       isInbtwTime = check_overlap_clockedin(dateTime, dateTime) 
       if isInbtwTime == false
         clock_event = ClockEvent.create(user_id: current_user.id, entry_date: dateTime, clock_in: dateTime,clocking_in: true)   

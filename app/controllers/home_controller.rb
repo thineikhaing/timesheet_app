@@ -17,11 +17,12 @@ class HomeController < ApplicationController
 
     monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+).round(2)
     weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+).round(2)
+    business_days_hours = current_user.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+)
 
     today = Date.today # Today's date
     current_week = (today.at_beginning_of_week..today.at_end_of_week)
 
-    render json: {clock_events: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 
+    render json: {clock_events: clock_events, isClockingin: isClockingin,clockedinDate: clockedinDate, monthly_hrs: monthly_worked_hours,business_days_hours:business_days_hours,weekly_hrs:weekly_worked_hours,current_week:current_week, status: 200 } 
   end
 
   def get_user_clockevents
@@ -30,7 +31,9 @@ class HomeController < ApplicationController
     monthly_worked_hours = staff.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
     weekly_worked_hours = staff.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
 
-    render json: {user: staff,clock_events: clock_events,monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours, status: 200 } 
+    business_days_hours = staff.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+)
+
+    render json: {user: staff,clock_events: clock_events,monthly_hrs: monthly_worked_hours,weekly_hrs:weekly_worked_hours,business_days_hours:business_days_hours, status: 200 } 
 
   end
 
@@ -48,9 +51,9 @@ class HomeController < ApplicationController
       dateTime = DateTime.now
     end
     
-    clock_event = current_user.clock_events.where(entry_date: dateTime,clocking_in: true).take 
+    clock_event = current_user.clock_events.where(clocking_in: true).take 
+   
     if clock_event.present?
-     
       clock_event = clock_event.update(clock_out: dateTime,clocking_in: false)
     else
 

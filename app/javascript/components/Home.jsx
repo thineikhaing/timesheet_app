@@ -109,12 +109,12 @@ const Home = () => {
             center: true,
             cell: row => <a className="date-click" onClick={() => handleSelectDay(row.id)}>{moment(row.entry_date).format('MMMM Do YYYY')}</a>
         },
-        {   name: 'Clock In', 
+        {   name: 'Clocked In', 
             selector: row => `${ moment(row.clock_in).local().format(' hh:mm A')}`, 
             sortable: true, center: true 
         },
         {   
-            name: 'Clock Out', 
+            name: 'Clocked Out', 
             selector: row => `${ moment(row.clock_out).local().format(' hh:mm A')}`, 
             conditionalCellStyles: [
                 {

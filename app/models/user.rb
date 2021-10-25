@@ -6,11 +6,12 @@ class User < ApplicationRecord
 
   enum role: {admin: 0, user: 1}
   validates :username, :email, presence: true
+
   has_many :clock_events, dependent: :destroy
 
   def as_json(options=nil)
     super(only: [:id, :username, :email, :role,:last_sign_in_at], methods: [:clocked_in_status])
-end
+  end
 
   def clocked_in_status
     clocked_in = self.clock_events.where(clocking_in: true)
@@ -20,5 +21,7 @@ end
       return "clocked out"
     end
   end
+
+  
 
 end

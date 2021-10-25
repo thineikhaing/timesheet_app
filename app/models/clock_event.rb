@@ -6,7 +6,7 @@ class ClockEvent < ApplicationRecord
         super(only: [:id, :entry_date, :clock_in, :clock_out,:clocking_in], methods: [:total_hours])
     end
 
-    scope :current_month, ->{
+    scope :current_month, -> {
         start = Time.zone.now
         where(clock_in: start.beginning_of_month..start.end_of_month)  
     }
@@ -22,10 +22,18 @@ class ClockEvent < ApplicationRecord
         where(clock_in: start..ending)
     }
 
-
     scope :business_days, ->{
-        where("EXTRACT(DOW FROM clocked_in) in (?)", 1..5)
+        where("EXTRACT(DOW FROM clock_events.clock_in) in (?)", 1..5)
     }
+
+    def self.current_month_weekdays_weekends
+        start_date = Date.today.beginning_of_month
+        end_date = Date.today.end_of_month
+        weekdays = (start_date..end_date).select{|a| a.wday < 6 && a.wday > 0}.count
+        weekends = (start_date..end_date).select{|a| a.wday == 6 || a.wday == 0}.count
+    end
+
+
 
     def worked_hr
         if self.clock_in.present? && self.clock_out.present?

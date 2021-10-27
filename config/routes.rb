@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   
   root 'home#index'
   devise_for :users
-  resources :users, only: [:index, :show, :edit, :update]
+  resources :users, only: [:create, :show, :update, :destroy]
 
 
   get 'get_timesheet', to: 'home#get_timesheet'
@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   
   post 'update_clockevent' , to: 'home#update_clockevent'
   post 'delete_clockevent' , to: 'home#delete_clockevent'
-  
+
   get 'edit_clockevent/:id' , to: 'home#edit_clockevent'
   get 'get_user_clockevents/:id' , to: 'home#get_user_clockevents'
 

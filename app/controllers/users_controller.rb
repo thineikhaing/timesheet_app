@@ -21,6 +21,7 @@ def create
 
   def update
     @user.update(user_params)
+    bypass_sign_in @user
     render json: @user, status: :ok
   end
 

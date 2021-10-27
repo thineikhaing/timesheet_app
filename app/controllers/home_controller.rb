@@ -15,9 +15,9 @@ class HomeController < ApplicationController
       clockedinDate = check_clocking_in.clock_in
     end
 
-    monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
-    weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
-    business_days_hours = current_user.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+)
+    monthly_worked_hours = current_user.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+).round(2) rescue '0'
+    weekly_worked_hours = current_user.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+).round(2) rescue '0'
+    business_days_hours = current_user.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+).round(2) rescue '0'
 
     today = Date.today # Today's date
     current_week = (today.at_beginning_of_week..today.at_end_of_week)
@@ -28,8 +28,8 @@ class HomeController < ApplicationController
   def get_user_clockevents
     staff = User.find(params[:id])
     clock_events = staff.clock_events.select(:id, :entry_date, :clock_in, :clock_out).order("clock_in DESC")
-    monthly_worked_hours = staff.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+)
-    weekly_worked_hours = staff.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+)
+    monthly_worked_hours = staff.clock_events.current_month.map{|y| y.worked_hr}.reduce(:+).round(2) rescue '0'
+    weekly_worked_hours = staff.clock_events.current_week.map{|y| y.worked_hr}.reduce(:+).round(2) rescue '0'
 
     business_days_hours = staff.clock_events.business_days.map{|y| y.worked_hr}.reduce(:+)
 

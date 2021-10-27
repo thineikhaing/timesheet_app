@@ -39,7 +39,7 @@ export default function MenuAppBar() {
           <Link className="homelink" href="/">Timesheet Application</Link>
           </Typography>
           <div className="userIcon">
-                <Typography compoent='p'>{currentUser.username}</Typography>
+                <Typography compoent='p' className="current_username">{currentUser.username}</Typography>
               <IconButton
                 size="large"
                 aria-label="account of current user"

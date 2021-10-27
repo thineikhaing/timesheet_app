@@ -21,18 +21,32 @@ import Toolbar from '@mui/material/Toolbar';
 const AdminProfile = () => {
     const [currentUser, setCurrentUser] = useContext(MainContext);
     const [openalert, setAlertOpen] = React.useState(false);
+    const [newPassword, setNewPassword] = useState(null);
+    const [confirmPassword, setConfirmPassword] = useState(null);
+
     const handleUserSubmit = async (e) => {
         e.preventDefault()
         let formData = new FormData(e.target);
-        await api.put(`/users/${currentUser.id}`, formData).then((data) => {
-            setCurrentUser(data);
-            console.log(currentUser)
-            // location.reload()
-            setAlertOpen(true)
-
-        }).catch(res => {
-            console.log(res)
-        })
+        console.log(newPassword,confirmPassword)
+        if (newPassword !== confirmPassword) {
+            alert("Passwords don't match");
+        } else {
+            console.log(currentUser.id)
+            await api.put(`/users/${currentUser.id}`, formData).then((data) => {
+                setCurrentUser(data);
+                console.log(currentUser)
+                setAlertOpen(true)
+                setTimeout(
+                    () => location.reload(), 
+                    2000
+                  );
+                
+    
+            }).catch(res => {
+                console.log(res)
+            })
+        }
+       
     }
 
     return ( 
@@ -73,6 +87,21 @@ const AdminProfile = () => {
                     readOnly: true,
                 }}/>
                             <br/>
+                            <TextField 
+                            type="password" 
+                            name="user[password]" 
+                            label="Password" 
+                            onChange={(e) => setNewPassword(e.target.value)}
+                   
+                                required/>
+                            <br/>
+                            <TextField 
+                                required 
+                                type="password" 
+                                name="user[password_confirmation]" 
+                                label="Password Confirmation"
+                                onChange={(e) => setConfirmPassword(e.target.value)} 
+                                />
         
                             <div className="button-group">
                             

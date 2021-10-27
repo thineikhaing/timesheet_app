@@ -1,14 +1,19 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,:trackable
 
-  enum role: {admin: 0, user: 1}
-  validates :username, :email, presence: true
+ 
+  validates :username ,presence: true, uniqueness: { case_sensitive: false }
+  validates :email, presence: true
 
   has_many :clock_events, dependent: :destroy
 
+  enum role: {admin: 0, user: 1}
+  
   def as_json(options=nil)
     super(only: [:id, :username, :email, :role,:last_sign_in_at], methods: [:clocked_in_status])
   end
@@ -22,6 +27,6 @@ class User < ApplicationRecord
     end
   end
 
-  
+
 
 end

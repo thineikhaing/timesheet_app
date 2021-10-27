@@ -35,7 +35,7 @@ In order to run this locally, the following is required:
 Install the dependencies.
 
 ```sh
-$ cd clock-in-out-application
+$ cd timesheet_app
 $ bundle install
 $ yarn install
 ```

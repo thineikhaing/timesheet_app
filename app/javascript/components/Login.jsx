@@ -52,18 +52,15 @@ export const Container = styled.div`
   flex-direction:row;
   align-items: center;
   justify-content: center;
-
   .text_btn{
     color: rgb(46, 172, 186) !important;
   }
-
   .card{
     min-width: 360px;
     text-align: center;
     padding: 50px;
     margin-top: 60px;
   }
-
   .button-group{
     display:flex;
     flex-direction:row;

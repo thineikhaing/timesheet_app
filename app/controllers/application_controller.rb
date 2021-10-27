@@ -6,9 +6,7 @@ class ApplicationController < ActionController::Base
         root_path
     end
 
-
     private
-
     def role_template
         user_role = current_user.role ==  "admin" ? "admin" : "user"
         "#{user_role}_#{action_name}"

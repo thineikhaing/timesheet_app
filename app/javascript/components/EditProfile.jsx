@@ -18,18 +18,33 @@ import AlertTitle from '@mui/material/AlertTitle';
 const EditProfile = () => {
     const [currentUser, setCurrentUser] = useContext(MainContext);
     const [openalert, setAlertOpen] = React.useState(false);
+    const [newPassword, setNewPassword] = useState(null);
+    const [confirmPassword, setConfirmPassword] = useState(null);
+
     const handleUserSubmit = async (e) => {
         e.preventDefault()
         let formData = new FormData(e.target);
-        await api.put(`/users/${currentUser.id}`, formData).then((data) => {
-            setCurrentUser(data);
-            console.log(currentUser)
-            // location.reload()
-            setAlertOpen(true)
+        console.log(newPassword,confirmPassword)
+        if (newPassword !== confirmPassword) {
+            alert("Passwords don't match");
+        } else {
+            // make API call
+            await api.put(`/users/${currentUser.id}`, formData).then((data) => {
+                setCurrentUser(data);
+                console.log(currentUser)
+                setAlertOpen(true)
+                // $(".current_username").text(currentUser.username)
+                setTimeout(
+                    () => location.reload(), 
+                    2000
+                  );
 
-        }).catch(res => {
-            console.log(res)
-        })
+
+            }).catch(res => {
+                console.log(res)
+            })
+        }
+      
     }
 
     return ( 
@@ -64,11 +79,24 @@ const EditProfile = () => {
                     <EditForm>
                         <TextField name="user[username]" label="Username" defaultValue={currentUser.username}/>
                         <br/>
-                        <TextField type="email" name="user[email]" label="Email" defaultValue={currentUser.email} InputProps={{
-                readOnly: true,
-            }}/>
+                        <TextField type="email" name="user[email]" label="Email" defaultValue={currentUser.email} InputProps={{readOnly: true,}}/>
                         <br/>
-      
+                        <TextField 
+                            type="password" 
+                            name="user[password]" 
+                            label="Password" 
+                            onChange={(e) => setNewPassword(e.target.value)}
+                   
+                            required/>
+                        <br/>
+                        <TextField 
+                            required 
+                            type="password" 
+                            name="user[password_confirmation]" 
+                            label="Password Confirmation"
+                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                            />
+
                         <div className="button-group">
                         
                         <Button className="submit_btn" type="submit" variant="contained" color="warning">
